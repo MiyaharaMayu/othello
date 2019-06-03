@@ -17,6 +17,7 @@ public class Board {
 				goban[i][j] = "　";
 			}
 		}
+
 		goban[1][2] = bc;
 		goban[2][1] = bc;
 		goban[1][1] = wt;
@@ -34,6 +35,7 @@ public class Board {
 			System.out.print("\n");
 		}
 	}
+
 	public void setColor(int color) {
 		this.color = color;
 	}
