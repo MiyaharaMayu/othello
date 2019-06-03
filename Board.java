@@ -1,39 +1,49 @@
 package othello;
 import java.util.Scanner;
 
+// あくまでこれはオセロの局面を決めるクラスとし、
+// 標準入力などの部分はこのクラスとは分けて記述すると良い
 public class Board {
+    // TODO: 白と黒のコマ数を保存するようなものを用意しても良いかもしれない
 	private String[][] goban = new String[4][4];
 	private String bc = "●";
 	private String wt = "○";
 	private String putStone;
 	static int MASU = 4;
 	static String BLANK = "　";
-	public int color;
+	public int color = 0;
+    // TODO: Scannerはメイン関数に
 	Scanner scan = new Scanner(System.in);
 
-	public Board() {
-		for(int i = 0; i < 4; i++) {
-			for(int j = 0; j < 4; j++) {
+	public Board(int len) {
+		for(int i = 0; i < len; i++) {
+			for(int j = 0; j < len; j++) {
 				goban[i][j] = "　";
 			}
 		}
-		goban[1][2] = bc;
-		goban[2][1] = bc;
-		goban[1][1] = wt;
-		goban[2][2] = wt;
-
-		color = 0;
+        // 中央の座標
+        int x = len/2;
+        // 中央に配置
+		goban[x-1][x] = bc;
+		goban[x][x-1] = bc;
+		goban[x-1][x-1] = wt;
+		goban[x][x] = wt;
 	}
 
 	public void print() {
 		for(int i = 0; i < 4; i++) {
 			for(int j = 0; j < 4; j++) {
+                // TODO:
+                // printをわかりやすくし、
+                // 行数、列数を表示
+                // どこが打つことが可能かを明示
 				System.out.print(goban[i][j]);
-				System.out.print(" ");
+				System.out.print("|");
 			}
 			System.out.print("\n");
 		}
 	}
+
 	public void setColor(int color) {
 		this.color = color;
 	}
@@ -41,7 +51,12 @@ public class Board {
 	public void setProt(int color) {
 		int Y = 2;
 		int X = 2;
+        // TODO: whileの条件がおかしい
+        // ここは、コマが全て起き終わるまでを条件とする
+        // つまり、4*4の場合、12コマ置かれたらwhileを抜ける
+        // 標準入力を受ける部分は、全てmain関数に持っていく
 		while(canPutDown(Y,X) == false){
+            // TODO: 今が白か黒かを教える
 			System.out.println("行の数字を入力してください");	//プロットしてはいけないとき
 			Y = scan.nextInt();
 			System.out.println("列の数字を入力してください");
@@ -69,7 +84,19 @@ public class Board {
             return false;
         // 8方向のうち一箇所でもひっくり返せればこの場所に打てる
         // ひっくり返せるかどうかはもう1つのcanPutDownで調べる
-        if (canPutDown(y, x, 1, 0))
+
+        int dx = [0, 1, 0, -1, 1, -1, -1, 1];
+        int dy = [1, 0, -1, 0, 1, -1, 1, -1];
+        for (int i = 0; i < 8; i++) {
+            int vec_x = dx[i];
+            int vec_y = dy[i];
+            if (canPutDown(y, x, vec_y, vec_x)) {
+                return true;
+            }    
+        }
+        // どの方向もだめな場合はここには打てない
+        return false;
+        /*if (canPutDown(y, x, 1, 0))
             return true; // 右
         if (canPutDown(y, x, 0, 1))
             return true; // 下
@@ -85,9 +112,7 @@ public class Board {
             return true; // 右上
         if (canPutDown(y, x, -1, 1))
             return true; // 左下
-
-        // どの方向もだめな場合はここには打てない
-        return false;
+        */
     }
 
 	public boolean canPutDown(int y, int x, int vecY, int vecX) {
@@ -114,7 +139,7 @@ public class Board {
         y += vecY;
         // となりに石がある間ループがまわる
         while (x >= 0 && x < MASU && y >= 0 && y < MASU) {
-            // 空白が見つかったら打てない（１1つもはさめないから）
+            // 空白が見つかったら打てない（1つもはさめないから）
             if (goban[y][x] == BLANK)
                 return false;
             // 自分の石があればはさめるので打てる
